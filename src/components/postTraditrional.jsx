@@ -18,14 +18,14 @@ function PostTraditional() {
   }, []);
 
   return (
-    <div>
-      <h1>Post Traditional</h1>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
-    </div>
+    <div className="post-list">
+      {posts.map(post => (
+          <div onClick={() => handleClick(post.id)} key={post.id} className="post-item">
+              <h3 className="post-title">{post.title}</h3>
+              <p className="post-body">{post.body}</p>
+          </div>
+      ))}
+  </div>
   );
 }
 
