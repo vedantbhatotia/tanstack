@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "react-router-dom";
 function Postrq() {
     const {data,isError,isLoading,error,refetch} = useQuery({
          queryKey: ['posts'],
@@ -25,10 +26,12 @@ function Postrq() {
          <button onClick={refetch}>Fetch Data</button>
         <div className="post-list">
         {data?.data.map(post => (
+            <Link to={`/rq-posts/${post.id}`} key={post.id} className="post-item">
             <div onClick={() => handleClick(post.id)} key={post.id} className="post-item">
                 <h3 className="post-title">{post.title}</h3>
                 <p className="post-body">{post.body}</p>
             </div>
+            </Link>
         ))}
     </div>
         </>
