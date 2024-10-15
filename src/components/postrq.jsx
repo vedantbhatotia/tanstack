@@ -1,7 +1,29 @@
 import axios from "axios";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery,useMutation} from "@tanstack/react-query"
 import { Link } from "react-router-dom";
+import {useState} from 'react'
 function Postrq() {
+    const [title,setTitle] = useState();
+    const [body,setBody] = useState();
+    function handleSubmit(e){
+        e.preventDefault();
+        mutate({title,body});
+    }
+    const {mutate} = useMutation({
+        mutationFn:async({title,body})=>{
+            const response = await axios.post('http://localhost:4000/posts',{
+                title,
+                body
+            })
+            return response
+        },
+        onSuccess:()=>{
+            console.log("post created successfully");
+        },
+        onError:()=>{
+            console.log("post creation failed");
+        }
+    })  
     const {data,isError,isLoading,error,refetch} = useQuery({
          queryKey: ['posts'],
          queryFn:async()=>{
@@ -9,10 +31,7 @@ function Postrq() {
             return response
         },
         enabled:false,
-        // refetchInterval: 1000
         refetchIntervalInBackground: true,
-        // used when we want to update the data in the background while we are not on the same page/component
-        // used for polling data in regular intervals eg in trading applications where we need to update the data in real time
     }) 
     if(isLoading){
         return <div>Loading...</div>
@@ -25,6 +44,12 @@ function Postrq() {
         <>
          <button onClick={refetch}>Fetch Data</button>
         <div className="post-list">
+            <form>
+                <input onChange={(e)=>{setTitle(e.target.value)}} placeholder="enter post title" value={title}></input>
+                {/* <input></input> */}
+                <input onChange={(e)=>{setBody(e.target.value)}} placeholder="enter post body" value={body}></input>
+                <button onClick={handleSubmit}>Post</button>
+            </form>
         {data?.data.map(post => (
             <Link to={`/rq-posts/${post.id}`} key={post.id} className="post-item">
             <div onClick={() => handleClick(post.id)} key={post.id} className="post-item">

@@ -1,9 +1,7 @@
 import {useQuery} from "@tanstack/react-query";
 import axios from "axios";
+import { useState } from "react";
 function PaginatedQueries(){
-    const fetchColors = async()=>{
-        axios.get("https://localhost:4000/fruits");
-    }
     const {data,isLoading,isError,error} = useQuery({
         queryKey:["fruits"],
         queryFn:async()=>{
