@@ -2,8 +2,10 @@ import axios from "axios";
 import { useQuery,useMutation} from "@tanstack/react-query"
 import { Link } from "react-router-dom";
 import {useState} from 'react'
+import { useQueryClient } from "@tanstack/react-query";
 function Postrq() {
     const [title,setTitle] = useState();
+    const queryClient = useQueryClient();
     const [body,setBody] = useState();
     function handleSubmit(e){
         e.preventDefault();
@@ -17,11 +19,17 @@ function Postrq() {
             })
             return response
         },
-        onSuccess:()=>{
-            console.log("post created successfully");
+        onSuccess:(newData)=>{
+            // query cache list present containing posts the new post is just addedd to the list saving one get request
+            queryClient.setQueryData(['posts'],(oldData)=>{
+                return {
+                    ...oldData,
+                    data:[...oldData.data,newData.data]
+                }
+            })
         },
-        onError:()=>{
-            console.log("post creation failed");
+        onError:(error)=>{
+            console.log(error);
         }
     })  
     const {data,isError,isLoading,error,refetch} = useQuery({
@@ -30,7 +38,7 @@ function Postrq() {
             const response = await axios.get('http://localhost:4000/posts');
             return response
         },
-        enabled:false,
+        enabled:true,
         refetchIntervalInBackground: true,
     }) 
     if(isLoading){
@@ -39,7 +47,6 @@ function Postrq() {
     if(isError){
         return <div>Error: {error.message}</div>
     }
-    // console.log(data) 
     return (
         <>
          <button onClick={refetch}>Fetch Data</button>
